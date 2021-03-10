@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/mobilenet_v1_1.0_224_quant-modified.ckpt"
+all_model_checkpoint_paths: "/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/mobilenet_v1_1.0_224_quant-modified.ckpt"
