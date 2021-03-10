@@ -55,6 +55,9 @@ tf.app.flags.DEFINE_string(
     'dataset_name', 'imagenet', 'The name of the dataset to load.')
 
 tf.app.flags.DEFINE_string(
+    'tflite_file', 'imagenet', 'The name of the dataset to load.')
+
+tf.app.flags.DEFINE_string(
     'dataset_split_name', 'test', 'The name of the train/test split.')
 
 tf.app.flags.DEFINE_string(
@@ -161,7 +164,9 @@ def main(_):
 
     #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/quant8.tflite")
     #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/mobilenet_v2_modified.tflite")
-    interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/slim/inception_models/inception_v1_224_quant.tflite")
+    #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/slim/inception_models/inception_v1_224_quant.tflite")
+
+    interpreter = tf.lite.Interpreter(model_path=FLAGS.tflite_file)
     interpreter.allocate_tensors()
 
     input_details = interpreter.get_input_details()
