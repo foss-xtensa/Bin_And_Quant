@@ -20,6 +20,11 @@ from __future__ import print_function
 
 import math
 import tensorflow.compat.v1 as tf
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+
 import tf_slim as slim
 import numpy as np
 
@@ -106,7 +111,7 @@ def main(_):
   if not FLAGS.dataset_dir:
     raise ValueError('You must supply the dataset directory with --dataset_dir')
 
-  tf.logging.set_verbosity(tf.logging.INFO)
+  #tf.logging.set_verbosity(tf.logging.INFO)
   with tf.Graph().as_default():
     tf_global_step = slim.get_or_create_global_step()
 
@@ -195,7 +200,7 @@ def main(_):
                     num+=1
                 total = total+ FLAGS.batch_size
 
-                if total % 10 == 0 and total ==20:
+                if total % 100 == 0 and total==1000:
                     print("finished processing 1000 samples",total)
                     break
                     #break
