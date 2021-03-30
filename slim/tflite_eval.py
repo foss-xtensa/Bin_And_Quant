@@ -23,6 +23,8 @@ import tensorflow.compat.v1 as tf
 import tf_slim as slim
 import numpy as np
 
+import sys
+
 from tensorflow.contrib import quantize as contrib_quantize
 
 from datasets import dataset_factory
@@ -154,17 +156,10 @@ def main(_):
         capacity=1 * FLAGS.batch_size)
     ########################### load data and convert to numpy array
 
-    #import pdb
-    #pdb.set_trace()
     total = 0
     correct_predictions = 0
     total_batches = int(50000/FLAGS.batch_size)
     quantization=True
-    #label_checker = {}
-
-    #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/quant8.tflite")
-    #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/mobilenet_v2_modified.tflite")
-    #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/slim/inception_models/inception_v1_224_quant.tflite")
 
     interpreter = tf.lite.Interpreter(model_path=FLAGS.tflite_file)
     interpreter.allocate_tensors()
@@ -176,77 +171,44 @@ def main(_):
         sess.run([tf.local_variables_initializer(),tf.global_variables_initializer(),])
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-        #tf.train.start_queue_runners()
         try:
             while not coord.should_stop():
-        #with slim.queues.QueueRunners(sess):
-            #for i in range(total_batches):
-            #while not coord.should_stop():
                 np_image, np_label = sess.run([images, labels])
-                #print(len(np_image))
-                #height, width, _ = np_image[0].shape
-                #print(np_image[0].shape, np_label)
 
-
-                #'''
-
-                #logits_ = np.zeros((2,1001))
-                #interpreter = tf.lite.Interpreter(model_path="/home/ms75986/Desktop/Cadence/bin_quant/MobileNet/models/research/slim/mobilenet_v2_1.0_224.tflite")
-                #interpreter.allocate_tensors()
-
-                #input_details = interpreter.get_input_details()
-                #output_details = interpreter.get_output_details()
 
                 num=0
                 while(num < FLAGS.batch_size):
-                    #if np_label[num] in label_checker:
-                    #    label_checker[np_label[num]] += 1
-                    #else:
-                    #    label_checker[np_label[num]] = 1
-
-                    #input_data = np.expand_dims(np_image[num], axis=1).astype(np.float32)
 
                     if quantization:
-                        #input_details = interpreter.get_input_details()
-                        #output_details = interpreter.get_output_details()
                         input_shape = input_details[0]['shape']
                         input_scale, input_zero_point = input_details[0]["quantization"]
-                        #print(input_shape, input_scale, input_zero_point)
                         input_data = np.array(np_image[num], dtype=np.float32) /input_scale + input_zero_point
-                        #input_data = input_data /input_scale + input_zero_point
                         input_data = input_data.astype(input_details[0]["dtype"])
-                        #input_data = input_data.reshape(1,224,224,3)
                     else:
                         input_data = np.array(np_image[num], dtype=np.float32)
 
                     interpreter.set_tensor(input_details[0]['index'], input_data.reshape(1,224,224,3))
                     interpreter.invoke()
                     logits = interpreter.get_tensor(output_details[0]['index'])
-                    #logits_[num,:] = logits
                     top_prediction = logits.argmax()
                     correct_predictions += (top_prediction == np_label[num])
-                    #print(top_prediction)
                     num+=1
-                #'''
-    
-                #logits = tf.convert_to_tensor(logits_, dtype=tf.float32, name='MobilenetV2/Logits/output') 
                 total = total+ FLAGS.batch_size
 
-                if total % 1000 == 0:
+                if total % 10 == 0 and total ==20:
                     print("finished processing 1000 samples",total)
+                    break
                     #break
         except:
             coord.request_stop()
             coord.join(threads)
+    curr_accu = (correct_predictions*100) / total
 
     print("Accuracy", (correct_predictions*100) / total)
-    #import pdb
-    #pdb.set_trace()
-    #print(label_checker)
+    return curr_accu
+    #sys.exit(curr_accu)
                     
-    exit(0)
-    #'''
-    #logits, _ = network_fn(images)
+    #exit(0)
 
     if FLAGS.quantize:
       contrib_quantize.create_eval_graph()
