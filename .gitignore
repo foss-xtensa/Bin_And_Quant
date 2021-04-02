@@ -1,1 +1,9 @@
 slim/mobilenet_models/*
+slim/mobilenet_v2_result_models/*
+slim/mobilenet_v2_results/*
+slim/inception_top_acc_model.tflite
+slim/inception_modified.tflite
+slim/mobilenet_modified.tflite
+slim/mobilenet_top_acc_model.tflite
+slim/mobilenet_v1.txt
+slim/out.txt

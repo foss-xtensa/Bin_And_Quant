@@ -58,6 +58,10 @@ tf.app.flags.DEFINE_integer(
     'num_preprocessing_threads', 4,
     'The number of threads used to create the batches.')
 
+tf.app.flags.DEFINE_integer(
+    'eval_size', 10,
+    'The number of images used for evaluation.')
+
 tf.app.flags.DEFINE_string(
     'dataset_name', 'imagenet', 'The name of the dataset to load.')
 
@@ -200,7 +204,7 @@ def main(_):
                     num+=1
                 total = total+ FLAGS.batch_size
 
-                if total % 100 == 0 and total==1000:
+                if total % FLAGS.eval_size == 0 and total==FLAGS.eval_size:
                     print("finished processing 1000 samples",total)
                     break
                     #break
