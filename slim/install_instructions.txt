@@ -1,0 +1,31 @@
+pip3 install tensorflow==1.14.0
+
+
+#install flatbuffers 
+git clone https://github.com/google/flatbuffers
+cd flatbuffers
+git checkout 37a5dee10525cc58908aff99b0aa073bf91b9ba6
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+make
+cp flatc /usr/local/bin/
+cd ..
+pip3 install flatbuffers
+
+
+git clone --depth 1 https://github.com/tensorflow/tensorflow
+flatc --python --gen-object-api tensorflow/tensorflow/lite/schema/schema_v3.fbs
+
+pip3 install bitarray 
+
+
+
+
+
+#To run an eval script
+
+1. dataset_dir, dataset_name, tflite_file, eval_size
+python3 tflite_eval.py     --alsologtostderr  --dataset_dir=../../MobileNet/models/research/imagenet-data     --dataset_name=imagenet     --dataset_split_name=validation     --model_name=mobilenet_v2 --batch_size=10 --tflite_file=mobilenet_top_acc_model_1_.tflite --eval_size=10000
+
+# run mobilenet_v2 instructions 
+
+python3 main_tflite.py > out.txt
