@@ -1,3 +1,7 @@
+#create virtualenv
+
+python3 -m venv bAq-venv/
+
 pip3 install tensorflow==1.14.0
 
 
