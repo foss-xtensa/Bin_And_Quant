@@ -40,8 +40,10 @@ def save_model_to_file(model, model_filename):
 
 
 
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v1_224_quant.tflite'
-tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_224_100/model.tflite'
+#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_224_100/model.tflite'
+tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_1.0_224_quant.tflite'
+
+#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_top_acc_model_1_.tflite'
 model_name='mobilenet_v2' #'inception_v1'
 eval_size='1000'
 
@@ -52,11 +54,16 @@ def test_model_accuracy(tflite_model, model_name):
     orig_acc = orig_acc.stdout.decode('utf-8')
     #accuracy = float(orig_acc[-6:-1])
     #return accuracy
-    try:
-        accuracy = float(orig_acc[-6:-1])
-    except:
-        accuracy = float(orig_acc[-5:-1])
-    return accuracy
+    if len(orig_acc) > 20:
+        try:
+            #print("orig_acc:", orig_acc, len(orig_acc))
+            accuracy = float(orig_acc[-6:-1])
+        except:
+            #print("orig_acc:", orig_acc, len(orig_acc))
+            accuracy = float(orig_acc[-5:-1])
+        return accuracy
+    else:
+        return float(0)
 
 inital_accuracy = test_model_accuracy(tflite_model, model_name)
 print("inital accuracy:", inital_accuracy)
@@ -76,23 +83,28 @@ for buffer in model.buffers:
           params.append(len(buffer.data))
 params.sort(reverse=True)
 
-curr_layer = 0
+#curr_layer = 1
+#top_model_file = 'mobilenet_top_acc_model_'+str(curr_layer)+'_.tflite'
+#top_acc = inital_accuracy ######
+
 #while curr_layer <= num_layers:
-for curr_layer in range(num_layers):
+for curr_layer in range(num_layers): ########## change range from 0,num_layers
+    print("********* processing layer with params:********", curr_layer, params[curr_layer])
     #reload the model to avoid missing data in buffer
-    max_bins = 9
-    min_bins = 9
+    max_bins = 16 ##more than 2 layers
+    min_bins = 8
     top_acc_bins = []
 
     #load the latest model for layer > 0
     if curr_layer >0:
-        max_bins = 17 ###############
+        max_bins = 16
         tflite_model = top_model_file
-        curr_acc = top_acc - 3
+        curr_acc = top_acc - 10 ####
     else:
         curr_acc = inital_accuracy - 3
     top_acc = curr_acc
     model = load_model_from_file(tflite_model)
+    top_model_file = 'mobilenet_top_acc_model_'+str(curr_layer)+'_.tflite'
 
 
     #load the inital layer parameters of the FC layer
@@ -107,8 +119,8 @@ for curr_layer in range(num_layers):
     RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)
 
-    while ((curr_acc <= inital_accuracy - 0.2) and total_bins <= max_bins):
-    #while ((curr_acc <= inital_accuracy and total_bins <= max_bins+1)):
+    #while ((curr_acc <= inital_accuracy-0.2) and total_bins <= max_bins):
+    while ((curr_acc <= inital_accuracy and total_bins <= max_bins+1)):
       model = load_model_from_file(tflite_model)
       for buffer in model.buffers:
         if buffer.data is not None and len(buffer.data) == params[curr_layer]:
@@ -124,9 +136,9 @@ for curr_layer in range(num_layers):
       save_model_to_file(model, modified_file)
       curr_acc = test_model_accuracy(modified_file, model_name)
 
-      print("Accuracy for range values:", curr_acc, RangeValues)
-
-      if curr_acc > top_acc: #testing with -10
+      print("Accuracy for range values:", curr_acc, RangeValues, np.unique(v2))
+      
+      if curr_acc > top_acc-0.3: #testing with -10
         print("saving top acc model, RangeValues", top_model_file, RangeValues)
         top_acc = curr_acc
         top_bins = RangeValues
