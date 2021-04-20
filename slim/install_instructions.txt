@@ -1,12 +1,12 @@
 #create virtualenv
 
-python3 -m venv bAq-venv/
+python3 -m venv bAq-venv
 
 #activate virtualenv
 source bAq-venv/bin/activate
 
 pip3 install tensorflow==1.14.0
-
+pip3 install tf-slim
 
 #install flatbuffers 
 git clone https://github.com/google/flatbuffers
