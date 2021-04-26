@@ -32,24 +32,23 @@ def load_model_from_file(model_filename):
 
 
 model_name = 'mobilenet_v2'
-tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_224_100/model.tflite'
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v1_224_quant.tflite'
+#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_1.0_224_quant.tflite'
+tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v1_224_quant.tflite'
 
 #load the model
 model = load_model_from_file(tflite_model)
 
 params = []
 #code to identify large layers
-for buffer in model.buffers:
+for num,buffer in enumerate(model.buffers):
       if buffer.data is not None:
-          params.append(len(buffer.data))
-params.sort(reverse=True)
+          params.append([num,len(buffer.data)])
+params.sort(reverse=True,key=lambda tup: tup[1])
 
+curr_layer = 2
 
-curr_layer = 0
-
-for buffer in model.buffers:
-    if buffer.data is not None and len(buffer.data) == params[curr_layer]:
+for num,buffer in enumerate(model.buffers):
+    if buffer.data is not None and num == params[curr_layer][0]:
         original_weights = np.frombuffer(buffer.data, dtype=np.uint8)
         v2 = np.add(original_weights,0)
         v2_min = v2.min()
@@ -58,7 +57,7 @@ for buffer in model.buffers:
 
 RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
 
-print(RangeValues)
+print(RangeValues, len(v2))
 
 fig, (ax1, ax2) = plt.subplots(1, 2)
 name = model_name + '_' + str(curr_layer) + ' original hist bins, binned hist' 

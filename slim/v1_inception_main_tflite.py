@@ -57,9 +57,9 @@ def test_model_accuracy(tflite_model, model_name):
 
 #tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v1_1.0_224_quant.tflite'
 #change#
-tflite_model='mobilenet_v1_top_acc_model_0_.tflite'
+tflite_model='inception_v1_result_models/inception_top_acc_model_1_.tflite'
 
-model_name='mobilenet_v1'
+model_name='inception_v1'
 eval_size='1000'
 
 inital_accuracy = test_model_accuracy(tflite_model, model_name)
@@ -69,7 +69,7 @@ print("inital accuracy:", inital_accuracy)
 model = load_model_from_file(tflite_model)
 
 
-modified_file = 'mobilenet_v1_modified.tflite'
+modified_file = 'inception_v1_modified.tflite'
 num_layers = 7 #starts with zero
 
 params = []
@@ -84,7 +84,7 @@ params.sort(reverse=True,key=lambda tup: tup[1])
 #top_model_file = 'inception_top_acc_model_'+str(curr_layer)+'_.tflite'
 #top_acc = inital_accuracy
 
-start_layer = 1
+start_layer = 2
 
 for curr_layer in range(start_layer,num_layers): ########## change range from 0,num_layers
     print("************* Processing layer with parameters: **************", curr_layer, params[curr_layer])
@@ -102,7 +102,7 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         curr_acc = inital_accuracy - 3
     top_acc = curr_acc
     model = load_model_from_file(tflite_model)
-    top_model_file = 'mobilenet_v1_top_acc_model_'+str(curr_layer)+'_.tflite'
+    top_model_file = 'inception_v1_top_acc_model_'+str(curr_layer)+'_.tflite'
 
 
     #load the inital layer parameters of the FC layer
@@ -115,7 +115,7 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         break
 
     if curr_layer == start_layer:
-        RangeValues = [1,25,50,75,80,85,99,105,112,120,126,151,255]
+        RangeValues = [1,74,99,123,151,175,203,255]
     else:
         RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)
