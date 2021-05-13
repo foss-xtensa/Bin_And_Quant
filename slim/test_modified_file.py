@@ -40,15 +40,13 @@ def save_model_to_file(model, model_filename):
 
 
 
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v1_224_quant.tflite'
-tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_224_100/model.tflite'
-model_name='mobilenet_v2' #'inception_v1'
+model_name='inception_v1'
 
 
 
 modified_file = 'mobilenet_modified.tflite'
-top_model_file = 'mobilenet_top_acc_model.tflite'
-num_layers = 2 #starts with zero
+top_model_file ='inception_v1_result_models/inception_top_acc_model_1_.tflite'
+num_layers = 3 #starts with zero
 
 
 
@@ -57,22 +55,22 @@ model = load_model_from_file(to_test)
 
 params = []
 #code to identify large layers
-for buffer in model.buffers:
+for num,buffer in enumerate(model.buffers):
       if buffer.data is not None:
-          params.append(len(buffer.data))
-params.sort(reverse=True)
+          params.append([num,len(buffer.data)])
+params.sort(reverse=True,key=lambda tup: tup[1])
 
 model = load_model_from_file(to_test)
 curr_layer = 0
 
 while curr_layer <= num_layers:
     #load the inital layer parameters of the FC layer
-    for buffer in model.buffers:
-      if buffer.data is not None and len(buffer.data) >= 200000:
-        original_weights = np.frombuffer(buffer.data, dtype=np.uint8)
-        v2 = np.add(original_weights,0)
-        print(len(buffer.data), np.unique(v2), len(np.unique(v2)))
-        #break
+    for num,buffer in enumerate(model.buffers):
+        if buffer.data is not None and num == params[curr_layer][0]:
+            original_weights = np.frombuffer(buffer.data, dtype=np.uint8)
+            v2 = np.add(original_weights,0)
+            print(len(buffer.data), np.unique(v2), len(np.unique(v2)))
+            break
     curr_layer +=1
   
 
