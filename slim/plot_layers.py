@@ -32,8 +32,9 @@ def load_model_from_file(model_filename):
 
 
 model_name = 'mobilenet_v2'
+tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/person_detect_uint8.tflite'
 #tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_1.0_224_quant.tflite'
-tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v1_224_quant.tflite'
+#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v2_224_quant.tflite'
 
 #load the model
 model = load_model_from_file(tflite_model)
@@ -45,7 +46,7 @@ for num,buffer in enumerate(model.buffers):
           params.append([num,len(buffer.data)])
 params.sort(reverse=True,key=lambda tup: tup[1])
 
-curr_layer = 2
+curr_layer = 1
 
 for num,buffer in enumerate(model.buffers):
     if buffer.data is not None and num == params[curr_layer][0]:
@@ -59,10 +60,16 @@ RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.s
 
 print(RangeValues, len(v2))
 
+name = model_name + '_' + str(curr_layer) + ' original hist bins'
+plt.suptitle(name)
+plt.hist(v2, [x for x in range(256)])
+plt.show()
+exit(0)
+
 fig, (ax1, ax2) = plt.subplots(1, 2)
 name = model_name + '_' + str(curr_layer) + ' original hist bins, binned hist' 
 fig.suptitle(name)
-ax1.hist(v2)
+ax1.hist(v2)#, [x for x in range(256)])
 for num in RangeValues:
     ax1.axvline(x=num)
 ax2.hist(v2, bins=RangeValues)

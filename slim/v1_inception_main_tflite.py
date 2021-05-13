@@ -57,7 +57,7 @@ def test_model_accuracy(tflite_model, model_name):
 
 #tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v1_1.0_224_quant.tflite'
 #change#
-tflite_model='inception_v1_result_models/inception_top_acc_model_1_.tflite'
+tflite_model='inception_v1_result_models/inception_v1_top_acc_model_2_.tflite'
 
 model_name='inception_v1'
 eval_size='1000'
@@ -70,7 +70,7 @@ model = load_model_from_file(tflite_model)
 
 
 modified_file = 'inception_v1_modified.tflite'
-num_layers = 7 #starts with zero
+num_layers = 9 #starts with zero
 
 params = []
 #code to identify large layers
@@ -84,7 +84,7 @@ params.sort(reverse=True,key=lambda tup: tup[1])
 #top_model_file = 'inception_top_acc_model_'+str(curr_layer)+'_.tflite'
 #top_acc = inital_accuracy
 
-start_layer = 2
+start_layer = 3
 
 for curr_layer in range(start_layer,num_layers): ########## change range from 0,num_layers
     print("************* Processing layer with parameters: **************", curr_layer, params[curr_layer])
@@ -115,7 +115,13 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         break
 
     if curr_layer == start_layer:
-        RangeValues = [1,74,99,123,151,175,203,255]
+        RangeValues = [1,24,47,55,62,69,75,81,87,95,103,110,118,125,152,176,255]
+    elif curr_layer == 4:
+        RangeValues = [1,53,78,93,101,106,112,118,120,127,135,142,153,178,255]
+    elif curr_layer ==5:
+        RangeValues = [1,48,82,87,94,99,105,110,118,126,151,183,255]
+    elif curr_layer ==6:
+        RangeValues = [1,45,56,64,75,82,89,94,101,108,113,119,128,134,144,153,177,255]
     else:
         RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)

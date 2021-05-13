@@ -45,8 +45,8 @@ model_name='inception_v1'
 
 
 modified_file = 'mobilenet_modified.tflite'
-top_model_file ='inception_v1_result_models/inception_top_acc_model_1_.tflite'
-num_layers = 3 #starts with zero
+top_model_file ='inception_v2_top_acc_model_13_.tflite'
+num_layers = 13 #starts with zero
 
 
 
@@ -60,6 +60,7 @@ for num,buffer in enumerate(model.buffers):
           params.append([num,len(buffer.data)])
 params.sort(reverse=True,key=lambda tup: tup[1])
 
+print(params)
 model = load_model_from_file(to_test)
 curr_layer = 0
 
@@ -69,7 +70,7 @@ while curr_layer <= num_layers:
         if buffer.data is not None and num == params[curr_layer][0]:
             original_weights = np.frombuffer(buffer.data, dtype=np.uint8)
             v2 = np.add(original_weights,0)
-            print(len(buffer.data), np.unique(v2), len(np.unique(v2)))
+            print(curr_layer,len(buffer.data), np.unique(v2), len(np.unique(v2)))
             break
     curr_layer +=1
   

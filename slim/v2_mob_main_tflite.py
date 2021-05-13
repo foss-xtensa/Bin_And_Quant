@@ -57,7 +57,7 @@ def test_model_accuracy(tflite_model, model_name):
 
 #tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v1_1.0_224_quant.tflite'
 #change#
-tflite_model='mobilenet_v2_result_models/mobilenet_v2_n_4bins_n-1_4bins_67_9acc.tflite'
+tflite_model='mobilenet_v2_top_acc_model_3_.tflite'
 
 model_name='mobilenet_v2'
 eval_size='1000'
@@ -84,7 +84,7 @@ params.sort(reverse=True,key=lambda tup: tup[1])
 #top_model_file = 'inception_top_acc_model_'+str(curr_layer)+'_.tflite'
 #top_acc = inital_accuracy
 
-start_layer = 3
+start_layer = 5
 
 for curr_layer in range(start_layer,num_layers): ########## change range from 0,num_layers
     print("************* Processing layer with parameters: **************", curr_layer, params[curr_layer])
@@ -97,9 +97,9 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
     if curr_layer >start_layer:
         max_bins = 32
         tflite_model = top_model_file
-        curr_acc = top_acc - 3 ####
+        curr_acc = top_acc - 2 ####
     else:
-        curr_acc = inital_accuracy - 3
+        curr_acc = inital_accuracy - 2
     top_acc = curr_acc
     model = load_model_from_file(tflite_model)
     top_model_file = 'mobilenet_v2_top_acc_model_'+str(curr_layer)+'_.tflite'
@@ -114,13 +114,12 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         v2_max = v2.max()
         break
 
-    #RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
-    RangeValues = [1,49,74,85,95,101,108,116,125,135,145,151,177,255]
+    if curr_layer == start_layer:
+        RangeValues = [1,50,76,99,108,116,127,134,144,151,160,168,175,201,255] 
+    else:
+        RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)
 
-    #while ((curr_acc <= inital_accuracy-0.2) and total_bins <= max_bins):
-    #while ((curr_acc <= inital_accuracy and total_bins <= max_bins+1)):
-    
     curr_iter = 1
     while(total_bins <= max_bins +1):
       model = load_model_from_file(tflite_model)
