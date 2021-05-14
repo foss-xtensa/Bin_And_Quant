@@ -119,10 +119,10 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         v2_max = v2.max()
         break
 
-    if curr_layer == start_layer:
-        RangeValues = [1,76,101,110,115,120,126,130,133,140,147,151,156,160,177,255]
-    else:
-        RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
+    #if curr_layer == start_layer:
+    #    RangeValues = [1,76,101,110,115,120,126,130,133,140,147,151,156,160,177,255]
+    #else:
+    RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)
 
     curr_iter = 1
