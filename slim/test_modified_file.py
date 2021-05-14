@@ -40,11 +40,6 @@ def save_model_to_file(model, model_filename):
 
 
 
-model_name='inception_v1'
-
-
-
-modified_file = 'mobilenet_modified.tflite'
 top_model_file ='inception_v2_top_acc_model_13_.tflite'
 num_layers = 13 #starts with zero
 

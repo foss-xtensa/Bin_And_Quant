@@ -55,22 +55,23 @@ def test_model_accuracy(tflite_model, model_name):
         return float(0)
 
 
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v1_1.0_224_quant.tflite'
-#change#
 tflite_model='mobilenet_v1_results/v1_mob_layer1-2_16bins_64_42acc.tflite'
-
 model_name='mobilenet_v1'
 eval_size='1000'
+start_layer = 2
+num_layers = 9 #starts with zero
+max_bins=32
+pert=0.2 #perturbation for bin sensitivity analysis
+max_acc_drop=1
+
+
 
 inital_accuracy = test_model_accuracy(tflite_model, model_name)
 print("inital accuracy:", inital_accuracy)
 
 #load the model
 model = load_model_from_file(tflite_model)
-
-
-modified_file = 'mobilenet_v1_modified.tflite'
-num_layers = 9 #starts with zero
+modified_file = model_name+'_modified.tflite'
 
 params = []
 #code to identify large layers
@@ -79,30 +80,22 @@ for num,buffer in enumerate(model.buffers):
           params.append([num,len(buffer.data)])
 params.sort(reverse=True,key=lambda tup: tup[1])
 
-#change#
-#curr_layer = 1
-#top_model_file = 'inception_top_acc_model_'+str(curr_layer)+'_.tflite'
-#top_acc = inital_accuracy
-
-start_layer = 2
 
 for curr_layer in range(start_layer,num_layers): ########## change range from 0,num_layers
     print("************* Processing layer with parameters: **************", curr_layer, params[curr_layer])
 
     #reload the model to avoid missing data in buffer
-    max_bins = 32 ##more than 2 layers
     top_acc_bins = []
 
     #load the latest model for layer > 0
     if curr_layer >start_layer:
-        max_bins = 32
         tflite_model = top_model_file
-        curr_acc = top_acc - 1 ####
+        curr_acc = top_acc - max_acc_drop ####
     else:
-        curr_acc = inital_accuracy - 1 ###
+        curr_acc = inital_accuracy - max_acc_drop ###
     top_acc = curr_acc
     model = load_model_from_file(tflite_model)
-    top_model_file = 'mobilenet_v1_top_acc_model_'+str(curr_layer)+'_.tflite'
+    top_model_file = model_name +'_top_acc_model_'+str(curr_layer)+'_.tflite'
 
 
     #load the inital layer parameters of the FC layer
@@ -120,8 +113,6 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
         RangeValues = [v2_min, np.mean(v2) - np.std(v2), np.mean(v2), np.mean(v2) + np.std(v2), v2_max]
     total_bins = len(RangeValues)
 
-    #while ((curr_acc <= inital_accuracy-0.2) and total_bins <= max_bins):
-    #while ((curr_acc <= inital_accuracy and total_bins <= max_bins+1)):
     curr_iter = 1
     while(total_bins <= max_bins +1):
       model = load_model_from_file(tflite_model)
@@ -162,7 +153,7 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
                 v2 = np.add(original_weights,0)      
                 indices = np.where(np.logical_and(v2>=RangeValues[times], v2<=RangeValues[times+1]))
                 break
-            v2[indices] = np.uint8(v2[indices] + 0.2*v2[indices])
+            v2[indices] = np.uint8(v2[indices] + pert*v2[indices])
             buffer.data = v2
             save_model_to_file(model, modified_file)
             bin_acc.append(test_model_accuracy(modified_file, model_name))
@@ -177,7 +168,7 @@ for curr_layer in range(start_layer,num_layers): ########## change range from 0,
                     v2 = np.add(original_weights,0)
                     indices = np.where(np.logical_and(v2>=RangeValues[to_modify+times], v2<=RangeValues[to_modify+times+1]))
                     break
-              v2[indices] = np.uint8(v2[indices] + 0.2*v2[indices])
+              v2[indices] = np.uint8(v2[indices] + pert*v2[indices])
               buffer.data = v2
               save_model_to_file(model, modified_file)
               bin_acc.insert(to_modify+times,test_model_accuracy(modified_file, model_name))
