@@ -74,7 +74,7 @@ can be used to generate the huffman encoded B&Q compressed model. Change the tfl
 
 tflite_decompress.py
 
-Again, modify the model_name and include the layer_ids from the huffman_compressed folder and run python3 tflite_decompress.py. 
+Again, modify the model_name(line 83) and include the layer_ids(line 97) from the huffman_compressed folder and run python3 tflite_decompress.py. 
 This will generate a decompressed model.
 
 
