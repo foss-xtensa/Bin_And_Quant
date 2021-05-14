@@ -1,15 +1,15 @@
-#Bin & Quant on Tensorflow-Slim based vision models
+# Bin & Quant on Tensorflow-Slim based vision models
 
 We created the B&Q algorithm on the vision models created, trained and tested using tf-slim package. We modified the trained uint8 models and developed the code to test on ImageNet dataset. 
 
 
-#Dataset Preparation
+# Dataset Preparation
 Please follow the instructions provided in "preparing the datasets" section of Tensorflow-Slim image classification model library to create the TFRecord of imagenet and VisualWakeWord dataset. 
 
-#Trained vision models
+# Trained vision models
 The trained vision models provided by tensorflow can be found in the Original_Models folder. For additional trained models please refer: https://www.tensorflow.org/lite/guide/hosted_models#image_classification.
 
-#Sensitivity Analysis 
+# Sensitivity Analysis 
 Run the v1_mob_sensitivity.py file to perturb each layer of mobilenetV1 and record the inference accuracy. The lower the accuracy for a particular layer perturbation, the more sensitive the given layer. v2_mob_sensitivity.py is for mobilenetV2, v1_inception_sensitivity.py for inception v1, v2_inception_sensitivity.py for perturbing inception v2.  
 
 Parameters to modify: 
