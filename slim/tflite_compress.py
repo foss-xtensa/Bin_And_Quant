@@ -62,19 +62,8 @@ def compress(model_name, tflite_name, curr_layer):
 
         keys = alphabet_lower[:count]
 
-        '''
-        while curr_count<count:
-            if start not in unique_values:
-                keys.append(start)
-                start+=1
-                curr_count+=1
-            else:
-                start+=1
-        '''
-
         for num,val in enumerate(unique_values):
             mapping[unique_values[num]] = keys[num]
-        #mapping={26:'a'}
 
         curr_dir='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/' + model_name + '_huffman_compressed/'
 
