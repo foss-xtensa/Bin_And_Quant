@@ -18,8 +18,43 @@ Parameters to modify:
 3. Num_layers: Total layers perturbed. 
 
 # B&Q compression
+args_main_tflite.py is designed to perform automated B&Q on a given model. These parameters are determined by the user: 
+  --tflite_model TFLITE_MODEL
+                        quantized file
+  --model_name MODEL_NAME
+                        The name of the model eg. inception_v1/mobilenet_v1
+  --start_layer START_LAYER
+                        The layer at which compression starts
+  --total_layers TOTAL_LAYERS
+                        The total number of layers to compress
+  --pert PERT           The perturbation amount for bin sensitivity
+  --max_bins MAX_BINS   The maximum bins for each layer
+  --max_acc_drop MAX_ACC_DROP
+                        The maximum accuracy drop for each layer compression
+                        permitted
+  --eval_size EVAL_SIZE
+                        The eval size for each run, total number of images
+                        from Imagenet used for evaluation
 
 
+For example, to apply B&Q on mobilenet_v1, use the following command. 
+
+python3 args_main_tflite.py --tflite_model=mobilenet_models/mobilenet_v1_1.0_224_quant.tflite --model_name=mobilenet_v1 --start_layer=0 --total_layers=1 --pert=0.2 --max_bins=16 --max_acc_drop=1 --eval_size=10 > out.txt
+The out.txt will store the result of sensitivity analysis and the bin values. 
+
+Change the model name and file location to run B&Q on other models. 
+Also, to change to custom rangevalues, modify line 123. 
+
+Once the top accuracy model for a particular layer compression is generated, the unique values in a particular layer can be seen using test_modified_file.py. 
+In test_modified_file.py, change the top_model_file variable and num_layers. num_layers corresponds to the total number of layers for which the unique values is to be printed. 
+
+To plot the weight value distribution for a particular layer of a model, use plot_layers.py. Change the model_name and tflite_model parameters. The curr_layer parameter determines the layer for which the distribution is plotted. 
+
+Finally, to evaluate the B&Q model or the original model, use tflite_eval.py. 
+
+python3 tflite_eval.py     --alsologtostderr  --dataset_dir=../../MobileNet/models/research/imagenet-data     --dataset_name=imagenet     --dataset_split_name=validation     --model_name=inception_v2 --batch_size=10 --tflite_file=inception_v2_top_acc_model_12_.tflite --eval_size=10000
+
+Change the eval_size, model_name and tflite_file across different models. 
 
 The B&Q compressed models are provided in the B_Q_compressed_models folder. 
 
