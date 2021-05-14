@@ -18,7 +18,9 @@ Parameters to modify:
 3. Num_layers: Total layers perturbed. 
 
 # B&Q compression
-args_main_tflite.py is designed to perform automated B&Q on a given model. These parameters are determined by the user: 
+args_main_tflite.py 
+
+is designed to perform automated B&Q on a given model. These parameters are determined by the user: 
   --tflite_model TFLITE_MODEL
                         quantized file
   --model_name MODEL_NAME
@@ -46,11 +48,16 @@ Change the model name and file location to run B&Q on other models.
 Also, to change to custom rangevalues, modify line 123. 
 
 Once the top accuracy model for a particular layer compression is generated, the unique values in a particular layer can be seen using test_modified_file.py. 
-In test_modified_file.py, change the top_model_file variable and num_layers. num_layers corresponds to the total number of layers for which the unique values is to be printed. 
+
+test_modified_file.py
+
+, change the top_model_file variable and num_layers. num_layers corresponds to the total number of layers for which the unique values is to be printed. 
 
 To plot the weight value distribution for a particular layer of a model, use plot_layers.py. Change the model_name and tflite_model parameters. The curr_layer parameter determines the layer for which the distribution is plotted. 
 
-Finally, to evaluate the B&Q model or the original model, use tflite_eval.py. 
+Finally, to evaluate the B&Q model or the original model, use 
+
+tflite_eval.py. 
 
 python3 tflite_eval.py     --alsologtostderr  --dataset_dir=../../MobileNet/models/research/imagenet-data     --dataset_name=imagenet     --dataset_split_name=validation     --model_name=inception_v2 --batch_size=10 --tflite_file=inception_v2_top_acc_model_12_.tflite --eval_size=10000
 
