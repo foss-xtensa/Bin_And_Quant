@@ -56,11 +56,11 @@ def test_model_accuracy(tflite_model, model_name):
 
 
 tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_1.0_224_quant.tflite'
-#change#
-#tflite_model='mobilenet_v1_results/v1_mob_layer1-2_16bins_64_42acc.tflite'
-
 model_name='mobilenet_v2'
 eval_size='1000'
+pert = 0.03
+num_layers = 25 #starts with zero
+
 
 inital_accuracy = test_model_accuracy(tflite_model, model_name)
 print("inital accuracy:", inital_accuracy)
@@ -70,7 +70,6 @@ model = load_model_from_file(tflite_model)
 
 
 modified_file = 'mobilenet_v2_modified_sensitivity.tflite'
-num_layers = 25 #starts with zero
 
 params = []
 #code to identify large layers
@@ -79,7 +78,6 @@ for num,buffer in enumerate(model.buffers):
           params.append([num,len(buffer.data)])
 params.sort(reverse=True,key=lambda tup: tup[1])
 
-pert = 0.03
 start_layer = 0
 layer_acc = []
 for curr_layer in range(start_layer,num_layers): ########## change range from 0,num_layers
