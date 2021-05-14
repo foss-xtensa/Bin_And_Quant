@@ -66,11 +66,27 @@ Change the eval_size, model_name and tflite_file across different models.
 The B&Q compressed models are provided in the B_Q_compressed_models folder. 
 
 
+# Huffman Compression
+
+tflite_compress.py
+
+can be used to generate the huffman encoded B&Q compressed model. Change the tflite_model name to B&Q compressed model, model name and finally include all the layers to which Huffman compression needs to be applied. This code will generate a 'model_name'+_huffman_compressed folder with all the information required to decode. 
+
+tflite_decompress.py
+
+Again, modify the model_name and include the layer_ids from the huffman_compressed folder and run python3 tflite_decompress.py. 
+This will generate a decompressed model.
 
 
+# Person detect
+Similar to mobilenetV1, mobilenetV2, InceptionV1, InceptionV2, 
 
+person_detect_main_tflite.py can be used for B&Q compression on the uint8 person_detect model. 
+In order to run evaluation on all the visualWakeWord dataset, 
 
+python3 person_tflite_eval.py     --alsologtostderr     --checkpoint_path=original-mobilenet/mobilenet_v2_1.0_224.ckpt     --dataset_dir=../../MobileNet/models/research/slim/datasets/visual_data/     --dataset_name=visualwakewords --dataset_split_name=val     --model_name=mobilenet_v1 --batch_size=10 --eval_image_size=96 --use_grayscale=True --tflite_file=person_mobilenet_v1_decompressed.tflite --eval_size=40000 
 
+Modify the tflite_file parameter and the maximum number of images available for evaluation are 40,000.
 
 
 # TensorFlow-Slim image classification model library
