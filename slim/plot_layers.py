@@ -33,8 +33,7 @@ def load_model_from_file(model_filename):
 
 model_name = 'mobilenet_v2'
 tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/person_detect_uint8.tflite'
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/mobilenet_models/mobilenet_v2_1.0_224_quant.tflite'
-#tflite_model='/home/ms75986/Desktop/Cadence/bin_quant/Bin_And_Quant/slim/inception_models/inception_v2_224_quant.tflite'
+curr_layer = 1 #starts with 0
 
 #load the model
 model = load_model_from_file(tflite_model)
@@ -46,7 +45,6 @@ for num,buffer in enumerate(model.buffers):
           params.append([num,len(buffer.data)])
 params.sort(reverse=True,key=lambda tup: tup[1])
 
-curr_layer = 1
 
 for num,buffer in enumerate(model.buffers):
     if buffer.data is not None and num == params[curr_layer][0]:
