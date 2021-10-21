@@ -21,5 +21,3 @@ The trained MicroSpeech models is provided in speech_micro_train_2020_05_10.tgz.
 
 # 2. Vision Models 
 The slim/ folder in the main branch provides the code to apply B&Q on the vision models. 
-
-The results of B&Q applied on uint8 models: 
